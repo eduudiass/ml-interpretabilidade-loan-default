@@ -1,7 +1,7 @@
 import pandas as pd
 
 # carrega o CSV e transforma em DataFrame
-df = pd.read_csv("raw/Loan_default.csv")
+df = pd.read_csv("Loan_default.csv")
 
 # tamanho do dataset
 print(df.shape)
@@ -14,6 +14,36 @@ print(df.isnull().sum())
 
 # proporção de cada classe do target
 print(df["Default"].value_counts(normalize=True))
+
+#Bilbiotecas para a realização dos gráficos
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Salva os gráficos de análise exploratória
+
+# 1. Gráfico de contagem da variável alvo (evidencia a proporção de 88% / 12%)
+cores_default = {0: 'blue', 1: 'red', '0': 'blue', '1': 'red'}
+
+# 1. Gráfico de contagem da variável alvo
+plt.figure(figsize=(8, 5))
+sns.countplot(data=df, x='Default', hue='Default', palette=cores_default, legend=False)
+plt.title('Distribuição da Variável Alvo (Default)')
+plt.savefig('distribuicao_classes.png', dpi=150, bbox_inches='tight')
+plt.close()
+
+# 2. Histograma comparando a distribuição de Idade
+plt.figure(figsize=(10, 5))
+sns.histplot(data=df, x='Age', hue='Default', bins=30, kde=True, palette=cores_default)
+plt.title('Distribuição de Idade por Default')
+plt.savefig('histograma_idade.png', dpi=150, bbox_inches='tight')
+plt.close()
+
+# 3. Histograma comparando a distribuição de Renda (Income)
+plt.figure(figsize=(10, 5))
+sns.histplot(data=df, x='Income', hue='Default', bins=30, kde=True, palette=cores_default)
+plt.title('Distribuição de Renda por Default')
+plt.savefig('histograma_rendimento.png', dpi=150, bbox_inches='tight')
+plt.close()
 
 from sklearn.model_selection import train_test_split
 
@@ -129,7 +159,6 @@ print("AUC NB:", roc_auc_score(y_test, modelo_nb.predict_proba(X_test_transforma
 print("AUC Árvore:", roc_auc_score(y_test, modelo_arvore.predict_proba(X_test_transformado)[:, 1]))
 print("AUC Árvore balanceada:", roc_auc_score(y_test, modelo_arvore2.predict_proba(X_test_transformado)[:, 1]))
 
-import matplotlib.pyplot as plt
 from sklearn.tree import plot_tree
 
 # nomes das colunas depois do pré-processamento (31 colunas)
