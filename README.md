@@ -1,0 +1,39 @@
+# Previsão de Inadimplência nos Empréstimos e Interpretabilidade em Aprendizado de Máquina
+
+Este projeto investiga o treinamento, a avaliação e a capacidade de explicação de três algoritmos de classificação aplicados à concessão de crédito: KNN, Naïve Bayes e Árvore de Decisão. O objetivo principal consiste em prever se um cliente deixará de pagar um empréstimo e, sobretudo, compreender de forma clara quais fatores levam cada modelo a tomar suas decisões.
+
+## 1. Contextualização e Conjunto de Dados
+
+O estudo usa um conjunto de dados público chamado Loan Default, disponível na plataforma Kaggle. Esse conjunto tem 255.347 registros e 16 variáveis explicativas, que incluem dados numéricos e categóricos. A coluna Default é a variável que indica o objetivo do estudo. O cenário mostra um problema verdadeiro do setor financeiro, no qual prever o risco de não pagamento exige não só cálculos certos, mas também clareza para explicar por que um empréstimo é aprovado ou recusado.
+
+A análise dos dados mostra que há um grande desequilíbrio entre as classes, pois 88,4% dos clientes pagaram seus empréstimos no prazo e apenas 11,6% tiveram atrasos. Os gráficos criados na fase de análise visual mostram essa diferença de proporção e já indicam, desde o início, que há mais inadimplência entre clientes mais novos e nas categorias de menor renda.
+
+## 2. Pré-processamento, Treinamento e Avaliação
+
+Para preparar os dados, o conjunto foi dividido de forma estratificada, com 80% destinado ao treinamento, que correspondem a 204.277 linhas, e 20% para teste, com 51.070 linhas, mantendo a mesma proporção de pessoas que não pagam as dívidas nas duas partes. As nove variáveis numéricas foram padronizadas usando o StandardScaler, um passo essencial para garantir que o cálculo da distância no KNN não fosse influenciado por números muito grandes, como a renda. Já as sete variáveis categóricas foram transformadas em colunas binárias usando o OneHotEncoder, o que resultou em 31 colunas no total para treinar os modelos.
+
+Na fase de avaliação, a acurácia tradicional foi deixada de lado porque a previsão simples de que nenhum cliente ia dar calote já conseguia acertar 88,4%, escondendo o problema do modelo em identificar os verdadeiros devedores. Por esse motivo, a análise focou na capacidade de identificar corretamente os inadimplentes (Recall), no equilíbrio entre precisão e detecção (F1-Score) e na qualidade geral da classificação de risco avaliada pela curva AUC.
+
+Com os parâmetros padrão, os três algoritmos tiveram dificuldade em identificar os casos de calote, pois a base de dados estava desbalanceada, resultando em índices de detecção entre 2% e 5%. Ao ajustar os pesos na Árvore de Decisão e definir as probabilidades iniciais como 50% para cada classe no Naïve Bayes, o número de clientes inadimplentes identificados aumentou entre 66% e 70%, mas a precisão do modelo caiu para cerca de 21%, por causa do aumento no número de alertas falsos. Ao comparar globalmente usando a métrica AUC, que analisa a ordem de risco sem depender de um ponto específico, o Naïve Bayes teve o melhor desempenho, com 0,746, melhorando em relação à Árvore de Decisão balanceada, que teve 0,719, e do KNN, que ficou em 0,677.
+
+## 3. Investigação da Interpretabilidade
+
+Para explicar como cada algoritmo chegou às suas conclusões, foram usados métodos diferentes, baseados no funcionamento de cada modelo.
+
+A Árvore de Decisão apresenta uma forma clara e visível de entender o processo, mostrando o desenho próprio e calculando a importância de cada variável. A estrutura visual indica que o modelo realiza o primeiro corte na idade, dividindo os clientes com até cerca de 42,5 anos como o grupo mais propenso a deixar de pagar. Nos níveis seguintes, a árvore faz a decisão com base apenas nas variáveis da taxa de juros, renda, valor do empréstimo e tempo de emprego, e ignora completamente as outras variáveis da base.
+
+O Naïve Bayes também oferece uma interpretação natural ao observarmos diretamente as médias e as variações que o algoritmo calculou para cada grupo. A distância entre as médias das duas classes mostra que os clientes que não pagam seus débitos, em média, têm menos idade, pagam taxas de juros maiores, trabalham há menos tempo, ganham menos dinheiro e solicitam empréstimos com valores mais altos.
+
+O KNN, por sua vez, funciona como uma caixa-preta na prática, pois toma decisões analisando apenas os 15 vizinhos mais próximos, sem criar uma regra geral ou fórmula que seja fácil de entender. Para resolver esse problema, usou-se o método SHAP em uma amostra de teste, que mostrou que a idade pequena, os juros altos e o tempo de trabalho curto são os principais fatores que influenciam a previsão do KNN para o caso de calote. Além disso, a ferramenta LIME foi usada para tentar entender dois erros que o modelo cometeu (um falso positivo e um falso negativo). Embora o LIME tenha identificado variáveis que se alinham com o restante do estudo, o nível de confiança nas explicações locais foi muito fraco (R² de 0,20 e 0,17), o que indica que tentar entender o comportamento do KNN em situações individuais resulta em explicações com baixa precisão.
+
+## 4. Análise Comparativa e Limitações
+
+A comparação geral mostra que os resultados obtidos são muito lógicos no contexto financeiro, já que é normal que uma menor capacidade de pagar, junto com dívidas mais caras, aumente a possibilidade de não pagar as dívidas. O teste de importância usando permutação, aplicado da mesma forma nos três modelos, mostrou que todos concordam sobre as cinco variáveis mais importantes do problema: idade, taxa de juros, renda, tempo de emprego e valor do empréstimo. A única diferença importante foi na pontuação de crédito, que influenciou bastante as distâncias usadas no KNN, mas foi ignorada pela Árvore de Decisão e teve pouco efeito no Naïve Bayes.
+
+Em relação aos desafios de compreensão, cada técnica teve suas dificuldades específicas. A Árvore de Decisão teve que ser limitada em profundidade para ficar mais legível, o que resultou em folhas ainda confusas e com um alto nível de impureza. O Naïve Bayes assume que todas as variáveis têm uma distribuição normal e são independentes, o que não se encaixa na realidade das colunas binárias criadas no pré-processamento, e esse efeito acaba sendo contado duas vezes nos modelos que dependem de distância e probabilidade. O KNN já mostrou ser o modelo mais restrito para explicar, exigindo ferramentas externas fortes como SHAP e LIME, que, além de serem lentas, oferecem apenas aproximações que podem ser afetadas por ruídos.
+
+## 5. Desafio Final: O Papel da Interpretabilidade no Uso Consciente
+
+Os experimentos realizados ao longo do trabalho comprovam que avaliar um sistema de Aprendizado de Máquina vai muito além de buscar métricas elevadas de desempenho. Se a escolha do modelo fosse feita olhando apenas para a acurácia inicial de 88%, uma instituição financeira colocaria em operação um sistema incapaz de identificar os verdadeiros inadimplentes. Da mesma forma, aceitar as previsões de um modelo sem entender sua lógica interna impediria a identificação de falhas técnicas, como o impacto duplicado das variáveis binárias ou a baixa confiabilidade do KNN em casos individuais revelada pelo LIME.
+
+A interpretabilidade contribui para o uso consciente da tecnologia justamente por transformar resultados matemáticos em regras claras e abertas à auditoria humana. Saber que um modelo negou um empréstimo com base em critérios econômicos reais, como renda insuficiente frente aos juros cobrados, garante segurança para quem toma a decisão e transparência para o cliente avaliado. Dessa maneira, o domínio das ferramentas de explicação evita que algoritmos operem como caixas-pretas discriminatórias e assegura que a inteligência artificial atue como um apoio confiável, justo e coerente com a realidade do problema.
