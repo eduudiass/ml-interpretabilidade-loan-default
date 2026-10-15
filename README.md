@@ -32,7 +32,7 @@ A comparação geral mostra que os resultados obtidos são muito lógicos no con
 
 Em relação aos desafios de compreensão, cada técnica teve suas dificuldades específicas. A Árvore de Decisão teve que ser limitada em profundidade para ficar mais legível, o que resultou em folhas ainda misturadas e com um alto nível de impureza. O Naïve Bayes assume que todas as variáveis têm uma distribuição normal e são independentes, o que não se encaixa na realidade das colunas binárias criadas no pré-processamento, e esse efeito acaba sendo contado duas vezes nos modelos que dependem de distância e probabilidade. O KNN já mostrou ser o modelo mais restrito para explicar, exigindo ferramentas externas fortes como SHAP e LIME, que, além de serem lentas, oferecem apenas aproximações que podem ser afetadas por ruídos.
 
-## 5. Desafio Final: O Papel da Interpretabilidade no Uso Consciente
+## Desafio Final: O Papel da Interpretabilidade no Uso Consciente
 
 Os experimentos realizados ao longo do trabalho comprovam que avaliar um sistema de Aprendizado de Máquina vai muito além de buscar métricas elevadas de desempenho. Se a escolha do modelo fosse feita olhando apenas para a acurácia inicial de 88%, uma instituição financeira colocaria em operação um sistema incapaz de identificar os verdadeiros inadimplentes. Da mesma forma, aceitar as previsões de um modelo sem entender sua lógica interna impediria a identificação de falhas técnicas, como o impacto duplicado das variáveis binárias ou a baixa confiabilidade do KNN em casos individuais revelada pelo LIME.
 
